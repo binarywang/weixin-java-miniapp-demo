@@ -27,20 +27,25 @@ import java.io.File;
 @ConditionalOnClass(WxMaService.class)
 @EnableConfigurationProperties(WxMaProperties.class)
 public class WxMaConfiguration {
-    private static final WxMaMessageHandler templateMsgHandler = (wxMessage, context, service, sessionManager) -> service.getMsgService().sendTemplateMsg(WxMaTemplateMessage.newBuilder()
-            .templateId("此处更换为自己的模板id")
-            .formId("自己替换可用的formid")
-            .data(Lists.newArrayList(
-                    new WxMaTemplateMessage.Data("keyword1", "339208499", "#173177")))
-            .toUser(wxMessage.getFromUser())
-            .build());
+    private static final WxMaMessageHandler templateMsgHandler = (wxMessage, context, service, sessionManager) ->
+            service.getMsgService().sendTemplateMsg(WxMaTemplateMessage.newBuilder()
+                    .templateId("此处更换为自己的模板id")
+                    .formId("自己替换可用的formid")
+                    .data(Lists.newArrayList(
+                            new WxMaTemplateMessage.Data("keyword1", "339208499", "#173177")))
+                    .toUser(wxMessage.getFromUser())
+                    .build());
+
     private final WxMaMessageHandler logHandler = (wxMessage, context, service, sessionManager) -> {
         System.out.println("收到消息：" + wxMessage.toString());
         service.getMsgService().sendKefuMsg(WxMaKefuMessage.TEXT().content("收到信息为：" + wxMessage.toJson())
                 .toUser(wxMessage.getFromUser()).build());
     };
-    private final WxMaMessageHandler textHandler = (wxMessage, context, service, sessionManager) -> service.getMsgService().sendKefuMsg(WxMaKefuMessage.TEXT().content("回复文本消息")
-            .toUser(wxMessage.getFromUser()).build());
+
+    private final WxMaMessageHandler textHandler = (wxMessage, context, service, sessionManager) ->
+            service.getMsgService().sendKefuMsg(WxMaKefuMessage.TEXT().content("回复文本消息")
+                    .toUser(wxMessage.getFromUser()).build());
+
     private final WxMaMessageHandler picHandler = (wxMessage, context, service, sessionManager) -> {
         try {
             WxMediaUploadResult uploadResult = service.getMediaService()
@@ -56,6 +61,7 @@ public class WxMaConfiguration {
             e.printStackTrace();
         }
     };
+
     private final WxMaMessageHandler qrcodeHandler = (wxMessage, context, service, sessionManager) -> {
         try {
             final File file = service.getQrcodeService().createQrcode("123", 430);
@@ -88,7 +94,7 @@ public class WxMaConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public WxMaService WxMaService(WxMaConfig config) {
+    public WxMaService wxMaService(WxMaConfig config) {
         WxMaService service = new WxMaServiceImpl();
         service.setWxMaConfig(config);
         return service;
@@ -97,7 +103,8 @@ public class WxMaConfiguration {
     @Bean
     public WxMaMessageRouter router(WxMaService service) {
         final WxMaMessageRouter router = new WxMaMessageRouter(service);
-        router.rule().handler(logHandler).next()
+        router
+                .rule().handler(logHandler).next()
                 .rule().async(false).content("模板").handler(templateMsgHandler).end()
                 .rule().async(false).content("文本").handler(textHandler).end()
                 .rule().async(false).content("图片").handler(picHandler).end()
