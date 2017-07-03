@@ -5,7 +5,7 @@ logging:
     com.github.binarywang.demo.wechat: DEBUG
 
 wechat:
-  cp:
+  miniapp:
     appid: 111
     secret: 111
     token: 111
