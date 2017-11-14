@@ -28,7 +28,7 @@ import java.io.File;
 @EnableConfigurationProperties(WxMaProperties.class)
 public class WxMaConfiguration {
     private static final WxMaMessageHandler templateMsgHandler = (wxMessage, context, service, sessionManager) ->
-            service.getMsgService().sendTemplateMsg(WxMaTemplateMessage.newBuilder()
+            service.getMsgService().sendTemplateMsg(WxMaTemplateMessage.builder()
                     .templateId("此处更换为自己的模板id")
                     .formId("自己替换可用的formid")
                     .data(Lists.newArrayList(
@@ -38,12 +38,12 @@ public class WxMaConfiguration {
 
     private final WxMaMessageHandler logHandler = (wxMessage, context, service, sessionManager) -> {
         System.out.println("收到消息：" + wxMessage.toString());
-        service.getMsgService().sendKefuMsg(WxMaKefuMessage.TEXT().content("收到信息为：" + wxMessage.toJson())
+        service.getMsgService().sendKefuMsg(WxMaKefuMessage.newTextBuilder().content("收到信息为：" + wxMessage.toJson())
                 .toUser(wxMessage.getFromUser()).build());
     };
 
     private final WxMaMessageHandler textHandler = (wxMessage, context, service, sessionManager) ->
-            service.getMsgService().sendKefuMsg(WxMaKefuMessage.TEXT().content("回复文本消息")
+            service.getMsgService().sendKefuMsg(WxMaKefuMessage.newTextBuilder().content("回复文本消息")
                     .toUser(wxMessage.getFromUser()).build());
 
     private final WxMaMessageHandler picHandler = (wxMessage, context, service, sessionManager) -> {
@@ -53,7 +53,7 @@ public class WxMaConfiguration {
                             ClassLoader.getSystemResourceAsStream("tmp.png"));
             service.getMsgService().sendKefuMsg(
                     WxMaKefuMessage
-                            .IMAGE()
+                            .newImageBuilder()
                             .mediaId(uploadResult.getMediaId())
                             .toUser(wxMessage.getFromUser())
                             .build());
@@ -68,7 +68,7 @@ public class WxMaConfiguration {
             WxMediaUploadResult uploadResult = service.getMediaService().uploadMedia("image", file);
             service.getMsgService().sendKefuMsg(
                     WxMaKefuMessage
-                            .IMAGE()
+                            .newImageBuilder()
                             .mediaId(uploadResult.getMediaId())
                             .toUser(wxMessage.getFromUser())
                             .build());
