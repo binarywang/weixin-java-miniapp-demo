@@ -81,7 +81,7 @@ public class WxMaConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public WxMaConfig config() {
+    public WxMaConfig maConfig() {
         WxMaInMemoryConfig config = new WxMaInMemoryConfig();
         config.setAppid(this.properties.getAppid());
         config.setSecret(this.properties.getSecret());
@@ -94,9 +94,9 @@ public class WxMaConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public WxMaService wxMaService(WxMaConfig config) {
+    public WxMaService wxMaService(WxMaConfig maConfig) {
         WxMaService service = new WxMaServiceImpl();
-        service.setWxMaConfig(config);
+        service.setWxMaConfig(maConfig);
         return service;
     }
 
