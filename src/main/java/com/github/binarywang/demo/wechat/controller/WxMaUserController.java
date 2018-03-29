@@ -1,10 +1,5 @@
 package com.github.binarywang.demo.wechat.controller;
 
-import cn.binarywang.wx.miniapp.api.WxMaService;
-import cn.binarywang.wx.miniapp.bean.WxMaJscode2SessionResult;
-import cn.binarywang.wx.miniapp.bean.WxMaUserInfo;
-import com.github.binarywang.demo.wechat.utils.JsonUtils;
-import me.chanjar.weixin.common.exception.WxErrorException;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,7 +8,12 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletRequest;
+import cn.binarywang.wx.miniapp.api.WxMaService;
+import cn.binarywang.wx.miniapp.bean.WxMaJscode2SessionResult;
+import cn.binarywang.wx.miniapp.bean.WxMaPhoneNumberInfo;
+import cn.binarywang.wx.miniapp.bean.WxMaUserInfo;
+import com.github.binarywang.demo.wechat.utils.JsonUtils;
+import me.chanjar.weixin.common.exception.WxErrorException;
 
 /**
  * 微信小程序用户接口
@@ -31,7 +31,7 @@ public class WxMaUserController {
     /**
      * 登陆接口
      */
-    @GetMapping("login")
+    @GetMapping("/login")
     public String login(String code) {
         if (StringUtils.isBlank(code)) {
             return "empty jscode";
@@ -41,7 +41,6 @@ public class WxMaUserController {
             WxMaJscode2SessionResult session = this.wxService.getUserService().getSessionInfo(code);
             this.logger.info(session.getSessionKey());
             this.logger.info(session.getOpenid());
-            this.logger.info(session.getExpiresin().toString());
             //TODO 可以增加自己的逻辑，关联业务相关数据
             return JsonUtils.toJson(session);
         } catch (WxErrorException e) {
@@ -55,7 +54,7 @@ public class WxMaUserController {
      * 获取用户信息接口
      * </pre>
      */
-    @GetMapping("info")
+    @GetMapping("/info")
     public String info(String sessionKey, String signature, String rawData, String encryptedData, String iv) {
         // 用户信息校验
         if (!this.wxService.getUserService().checkUserInfo(sessionKey, rawData, signature)) {
@@ -66,6 +65,24 @@ public class WxMaUserController {
         WxMaUserInfo userInfo = this.wxService.getUserService().getUserInfo(sessionKey, encryptedData, iv);
 
         return JsonUtils.toJson(userInfo);
+    }
+
+    /**
+     * <pre>
+     * 获取用户绑定手机号信息
+     * </pre>
+     */
+    @GetMapping("/phone")
+    public String phone(String sessionKey, String signature, String rawData, String encryptedData, String iv) {
+        // 用户信息校验
+        if (!this.wxService.getUserService().checkUserInfo(sessionKey, rawData, signature)) {
+            return "user check failed";
+        }
+
+        // 解密
+        WxMaPhoneNumberInfo phoneNoInfo = this.wxService.getUserService().getPhoneNoInfo(sessionKey, encryptedData, iv);
+
+        return JsonUtils.toJson(phoneNoInfo);
     }
 
 }
