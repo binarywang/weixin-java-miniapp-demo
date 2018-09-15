@@ -1,13 +1,14 @@
 debug: true
 logging:
   level:
-    org.springframework.web: DEBUG
-    com.github.binarywang.demo.wx.miniapp: DEBUG
-
-wechat:
+    org.springframework.web: info
+    com.github.binarywang.demo.wx.miniapp: debug
+    cn.binarywang.wx.miniapp: debug
+wx:
   miniapp:
-    appid: 111
-    secret: 111
-    token: 111
-    aesKey: 111
-    msgDataFormat: JSON
+    configs:
+        - appid: #微信小程序的appid
+          secret: #微信小程序的Secret
+          token: #微信小程序消息服务器配置的token
+          aesKey: #微信小程序消息服务器配置的EncodingAESKey
+          msgDataFormat: JSON
