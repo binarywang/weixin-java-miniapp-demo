@@ -12,6 +12,7 @@ import org.springframework.context.annotation.Configuration;
 import cn.binarywang.wx.miniapp.api.WxMaService;
 import cn.binarywang.wx.miniapp.api.impl.WxMaServiceImpl;
 import cn.binarywang.wx.miniapp.bean.WxMaKefuMessage;
+import cn.binarywang.wx.miniapp.bean.WxMaTemplateData;
 import cn.binarywang.wx.miniapp.bean.WxMaTemplateMessage;
 import cn.binarywang.wx.miniapp.config.WxMaInMemoryConfig;
 import cn.binarywang.wx.miniapp.message.WxMaMessageHandler;
@@ -32,7 +33,7 @@ public class WxMaConfiguration {
             .templateId("此处更换为自己的模板id")
             .formId("自己替换可用的formid")
             .data(Lists.newArrayList(
-                new WxMaTemplateMessage.Data("keyword1", "339208499", "#173177")))
+                new WxMaTemplateData("keyword1", "339208499", "#173177")))
             .toUser(wxMessage.getFromUser())
             .build());
 
