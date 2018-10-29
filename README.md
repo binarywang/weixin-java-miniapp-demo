@@ -1,8 +1,10 @@
-### 本项目为weixin-java-tools的Demo演示程序，基于Spring Boot构建，实现微信小程序后端开发功能，支持多个小程序。
-更多信息请查阅：https://github.com/Wechat-Group/weixin-java-tools
-
+[![码云Gitee](https://gitee.com/binary/weixin-java-miniapp-demo/badge/star.svg?theme=blue)](https://gitee.com/binary/weixin-java-miniapp-demo)
+[![Github](http://github-svg-buttons.herokuapp.com/star.svg?user=binarywang&repo=weixin-java-miniapp-demo&style=flat&background=1081C1)](https://github.com/binarywang/weixin-java-miniapp-demo)
 [![Build Status](https://travis-ci.org/binarywang/weixin-java-miniapp-demo.svg?branch=master)](https://travis-ci.org/binarywang/weixin-java-miniapp-demo)
 -----------------------
+
+### 本项目为weixin-java-tools的Demo演示程序，基于Spring Boot构建，实现微信小程序后端开发功能，支持多个小程序。
+更多信息请查阅：https://github.com/Wechat-Group/weixin-java-tools
 
 ## 使用步骤：
 1. 配置：复制 `/src/main/resources/application.yml.template` 或者修改其扩展名生成 `application.yml` 文件，根据自己需要填写相关配置（需要注意的是：yml文件内的属性冒号后面的文字之前需要加空格，可参考已有配置，否则属性会设置不成功）；	
