@@ -106,6 +106,7 @@ public class WxMaConfiguration {
                 config.setSecret(a.getSecret());
                 config.setToken(a.getToken());
                 config.setAesKey(a.getAesKey());
+                config.setMsgDataFormat(a.getMsgDataFormat());
 
                 WxMaService service = new WxMaServiceImpl();
                 service.setWxMaConfig(config);
