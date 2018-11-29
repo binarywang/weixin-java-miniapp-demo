@@ -45,10 +45,7 @@ public class WxMaMediaController {
      */
     @PostMapping("/upload")
     public List<String> uploadMedia(@PathVariable String appid, HttpServletRequest request) throws WxErrorException {
-        final WxMaService wxService = WxMaConfiguration.getMaServices().get(appid);
-        if (wxService == null) {
-            throw new IllegalArgumentException(String.format("未找到对应appid=[%d]的配置，请核实！", appid));
-        }
+        final WxMaService wxService = WxMaConfiguration.getMaService(appid);
 
         CommonsMultipartResolver resolver = new CommonsMultipartResolver(request.getSession().getServletContext());
 
@@ -81,10 +78,7 @@ public class WxMaMediaController {
      */
     @GetMapping("/download/{mediaId}")
     public File getMedia(@PathVariable String appid, @PathVariable String mediaId) throws WxErrorException {
-        final WxMaService wxService = WxMaConfiguration.getMaServices().get(appid);
-        if (wxService == null) {
-            throw new IllegalArgumentException(String.format("未找到对应appid=[%d]的配置，请核实！", appid));
-        }
+        final WxMaService wxService = WxMaConfiguration.getMaService(appid);
 
         return wxService.getMediaService().getMedia(mediaId);
     }

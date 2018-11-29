@@ -92,8 +92,13 @@ public class WxMaConfiguration {
         return routers;
     }
 
-    public static Map<String, WxMaService> getMaServices() {
-        return maServices;
+    public static WxMaService getMaService(String appid) {
+        WxMaService wxService = maServices.get(appid);
+        if (wxService == null) {
+            throw new IllegalArgumentException(String.format("未找到对应appid=[%s]的配置，请核实！", appid));
+        }
+
+        return wxService;
     }
 
     @Bean

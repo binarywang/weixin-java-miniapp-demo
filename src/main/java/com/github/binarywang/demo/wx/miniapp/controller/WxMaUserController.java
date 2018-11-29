@@ -35,10 +35,7 @@ public class WxMaUserController {
             return "empty jscode";
         }
 
-        final WxMaService wxService = WxMaConfiguration.getMaServices().get(appid);
-        if (wxService == null) {
-            throw new IllegalArgumentException(String.format("未找到对应appid=[%d]的配置，请核实！", appid));
-        }
+        final WxMaService wxService = WxMaConfiguration.getMaService(appid);
 
         try {
             WxMaJscode2SessionResult session = wxService.getUserService().getSessionInfo(code);
@@ -60,10 +57,7 @@ public class WxMaUserController {
     @GetMapping("/info")
     public String info(@PathVariable String appid, String sessionKey,
                        String signature, String rawData, String encryptedData, String iv) {
-        final WxMaService wxService = WxMaConfiguration.getMaServices().get(appid);
-        if (wxService == null) {
-            throw new IllegalArgumentException(String.format("未找到对应appid=[%d]的配置，请核实！", appid));
-        }
+        final WxMaService wxService = WxMaConfiguration.getMaService(appid);
 
         // 用户信息校验
         if (!wxService.getUserService().checkUserInfo(sessionKey, rawData, signature)) {
@@ -84,10 +78,7 @@ public class WxMaUserController {
     @GetMapping("/phone")
     public String phone(@PathVariable String appid, String sessionKey, String signature,
                         String rawData, String encryptedData, String iv) {
-        final WxMaService wxService = WxMaConfiguration.getMaServices().get(appid);
-        if (wxService == null) {
-            throw new IllegalArgumentException(String.format("未找到对应appid=[%d]的配置，请核实！", appid));
-        }
+        final WxMaService wxService = WxMaConfiguration.getMaService(appid);
 
         // 用户信息校验
         if (!wxService.getUserService().checkUserInfo(sessionKey, rawData, signature)) {

@@ -39,10 +39,7 @@ public class WxPortalController {
             throw new IllegalArgumentException("请求参数非法，请核实!");
         }
 
-        final WxMaService wxService = WxMaConfiguration.getMaServices().get(appid);
-        if (wxService == null) {
-            throw new IllegalArgumentException(String.format("未找到对应appid=[%d]的配置，请核实！", appid));
-        }
+        final WxMaService wxService = WxMaConfiguration.getMaService(appid);
 
         if (wxService.checkSignature(timestamp, nonce, signature)) {
             return echostr;
@@ -63,10 +60,7 @@ public class WxPortalController {
                 " timestamp=[{}], nonce=[{}], requestBody=[\n{}\n] ",
             msgSignature, encryptType, signature, timestamp, nonce, requestBody);
 
-        final WxMaService wxService = WxMaConfiguration.getMaServices().get(appid);
-        if (wxService == null) {
-            throw new IllegalArgumentException(String.format("未找到对应appid=[%d]的配置，请核实！", appid));
-        }
+        final WxMaService wxService = WxMaConfiguration.getMaService(appid);
 
         final boolean isJson = Objects.equals(wxService.getWxMaConfig().getMsgDataFormat(),
             WxMaConstants.MsgDataFormat.JSON);
