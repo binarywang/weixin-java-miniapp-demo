@@ -18,7 +18,7 @@
     <description>Spring Boot Demo with wechat miniapp</description>
 
     <properties>
-        <weixin-java-miniapp.version>3.2.0</weixin-java-miniapp.version>
+        <weixin-java-miniapp.version>3.3.0</weixin-java-miniapp.version>
 
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>

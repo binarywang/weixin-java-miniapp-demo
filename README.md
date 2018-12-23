@@ -3,8 +3,8 @@
 [![Build Status](https://travis-ci.org/binarywang/weixin-java-miniapp-demo.svg?branch=master)](https://travis-ci.org/binarywang/weixin-java-miniapp-demo)
 -----------------------
 
-### 本项目为weixin-java-tools的Demo演示程序，基于Spring Boot构建，实现微信小程序后端开发功能，支持多个小程序。
-更多信息请查阅：https://github.com/Wechat-Group/weixin-java-tools
+### 本项目为WxJava的Demo演示程序，基于Spring Boot构建，实现微信小程序后端开发功能，支持多个小程序。
+更多信息请查阅：https://github.com/Wechat-Group/WxJava
 
 ## 使用步骤：
 1. 请注意，本demo为简化代码编译时加入了lombok支持，如果不了解lombok的话，请先学习下相关知识，比如可以阅读[此文章](https://mp.weixin.qq.com/s/cUc-bUcprycADfNepnSwZQ)；
