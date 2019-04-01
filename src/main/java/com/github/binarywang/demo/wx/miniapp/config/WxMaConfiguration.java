@@ -22,12 +22,66 @@ import com.google.common.collect.Maps;
 import me.chanjar.weixin.common.bean.result.WxMediaUploadResult;
 import me.chanjar.weixin.common.error.WxErrorException;
 
+import javax.annotation.PostConstruct;
+
 /**
  * @author <a href="https://github.com/binarywang">Binary Wang</a>
  */
 @Configuration
 @EnableConfigurationProperties(WxMaProperties.class)
 public class WxMaConfiguration {
+    private WxMaProperties properties;
+
+    private static Map<String, WxMaMessageRouter> routers = Maps.newHashMap();
+    private static Map<String, WxMaService> maServices = Maps.newHashMap();
+
+    @Autowired
+    public WxMaConfiguration(WxMaProperties properties) {
+        this.properties = properties;
+    }
+
+    public static Map<String, WxMaMessageRouter> getRouters() {
+        return routers;
+    }
+
+    public static WxMaService getMaService(String appid) {
+        WxMaService wxService = maServices.get(appid);
+        if (wxService == null) {
+            throw new IllegalArgumentException(String.format("未找到对应appid=[%s]的配置，请核实！", appid));
+        }
+
+        return wxService;
+    }
+
+    @PostConstruct
+    public void init() {
+        maServices = this.properties.getConfigs()
+            .stream()
+            .map(a -> {
+                WxMaInMemoryConfig config = new WxMaInMemoryConfig();
+                config.setAppid(a.getAppid());
+                config.setSecret(a.getSecret());
+                config.setToken(a.getToken());
+                config.setAesKey(a.getAesKey());
+                config.setMsgDataFormat(a.getMsgDataFormat());
+
+                WxMaService service = new WxMaServiceImpl();
+                service.setWxMaConfig(config);
+                routers.put(a.getAppid(), this.newRouter(service));
+                return service;
+            }).collect(Collectors.toMap(s -> s.getWxMaConfig().getAppid(), a -> a));
+    }
+
+    private WxMaMessageRouter newRouter(WxMaService service) {
+        final WxMaMessageRouter router = new WxMaMessageRouter(service);
+        router
+            .rule().handler(logHandler).next()
+            .rule().async(false).content("模板").handler(templateMsgHandler).end()
+            .rule().async(false).content("文本").handler(textHandler).end()
+            .rule().async(false).content("图片").handler(picHandler).end()
+            .rule().async(false).content("二维码").handler(qrcodeHandler).end();
+        return router;
+    }
     private final WxMaMessageHandler templateMsgHandler = (wxMessage, context, service, sessionManager) ->
         service.getMsgService().sendTemplateMsg(WxMaTemplateMessage.builder()
             .templateId("此处更换为自己的模板id")
@@ -77,60 +131,5 @@ public class WxMaConfiguration {
             e.printStackTrace();
         }
     };
-
-    private WxMaProperties properties;
-
-    private static Map<String, WxMaMessageRouter> routers = Maps.newHashMap();
-    private static Map<String, WxMaService> maServices = Maps.newHashMap();
-
-    @Autowired
-    public WxMaConfiguration(WxMaProperties properties) {
-        this.properties = properties;
-    }
-
-    public static Map<String, WxMaMessageRouter> getRouters() {
-        return routers;
-    }
-
-    public static WxMaService getMaService(String appid) {
-        WxMaService wxService = maServices.get(appid);
-        if (wxService == null) {
-            throw new IllegalArgumentException(String.format("未找到对应appid=[%s]的配置，请核实！", appid));
-        }
-
-        return wxService;
-    }
-
-    @Bean
-    public Object services() {
-        maServices = this.properties.getConfigs()
-            .stream()
-            .map(a -> {
-                WxMaInMemoryConfig config = new WxMaInMemoryConfig();
-                config.setAppid(a.getAppid());
-                config.setSecret(a.getSecret());
-                config.setToken(a.getToken());
-                config.setAesKey(a.getAesKey());
-                config.setMsgDataFormat(a.getMsgDataFormat());
-
-                WxMaService service = new WxMaServiceImpl();
-                service.setWxMaConfig(config);
-                routers.put(a.getAppid(), this.newRouter(service));
-                return service;
-            }).collect(Collectors.toMap(s -> s.getWxMaConfig().getAppid(), a -> a));
-
-        return Boolean.TRUE;
-    }
-
-    private WxMaMessageRouter newRouter(WxMaService service) {
-        final WxMaMessageRouter router = new WxMaMessageRouter(service);
-        router
-            .rule().handler(logHandler).next()
-            .rule().async(false).content("模板").handler(templateMsgHandler).end()
-            .rule().async(false).content("文本").handler(textHandler).end()
-            .rule().async(false).content("图片").handler(picHandler).end()
-            .rule().async(false).content("二维码").handler(qrcodeHandler).end();
-        return router;
-    }
 
 }
