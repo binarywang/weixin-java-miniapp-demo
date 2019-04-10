@@ -1,14 +1,5 @@
 package com.github.binarywang.demo.wx.miniapp.config;
 
-import java.io.File;
-import java.util.Map;
-import java.util.stream.Collectors;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-
 import cn.binarywang.wx.miniapp.api.WxMaService;
 import cn.binarywang.wx.miniapp.api.impl.WxMaServiceImpl;
 import cn.binarywang.wx.miniapp.bean.WxMaKefuMessage;
@@ -21,8 +12,15 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import me.chanjar.weixin.common.bean.result.WxMediaUploadResult;
 import me.chanjar.weixin.common.error.WxErrorException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.annotation.Configuration;
 
 import javax.annotation.PostConstruct;
+import java.io.File;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * @author <a href="https://github.com/binarywang">Binary Wang</a>
@@ -55,8 +53,12 @@ public class WxMaConfiguration {
 
     @PostConstruct
     public void init() {
-        maServices = this.properties.getConfigs()
-            .stream()
+        List<WxMaProperties.Config> configs = this.properties.getConfigs();
+        if (configs == null) {
+            throw new RuntimeException("大哥，拜托先看下项目首页的说明（readme文件），添加下相关配置，注意别配错了！");
+        }
+
+        maServices = configs.stream()
             .map(a -> {
                 WxMaInMemoryConfig config = new WxMaInMemoryConfig();
                 config.setAppid(a.getAppid());
@@ -82,6 +84,7 @@ public class WxMaConfiguration {
             .rule().async(false).content("二维码").handler(qrcodeHandler).end();
         return router;
     }
+
     private final WxMaMessageHandler templateMsgHandler = (wxMessage, context, service, sessionManager) ->
         service.getMsgService().sendTemplateMsg(WxMaTemplateMessage.builder()
             .templateId("此处更换为自己的模板id")
