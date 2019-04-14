@@ -1,22 +1,15 @@
 package com.github.binarywang.demo.wx.miniapp.controller;
 
-import java.util.Objects;
-
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
 import cn.binarywang.wx.miniapp.api.WxMaService;
 import cn.binarywang.wx.miniapp.bean.WxMaMessage;
 import cn.binarywang.wx.miniapp.constant.WxMaConstants;
 import com.github.binarywang.demo.wx.miniapp.config.WxMaConfiguration;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Objects;
 
 /**
  * @author <a href="https://github.com/binarywang">Binary Wang</a>
@@ -51,9 +44,9 @@ public class WxPortalController {
     @PostMapping(produces = "application/xml; charset=UTF-8")
     public String post(@PathVariable String appid,
                        @RequestBody String requestBody,
-                       @RequestParam("msg_signature") String msgSignature,
-                       @RequestParam("encrypt_type") String encryptType,
-                       @RequestParam("signature") String signature,
+                       @RequestParam(name = "msg_signature", required = false) String msgSignature,
+                       @RequestParam(name = "encrypt_type", required = false) String encryptType,
+                       @RequestParam(name = "signature", required = false) String signature,
                        @RequestParam("timestamp") String timestamp,
                        @RequestParam("nonce") String nonce) {
         this.logger.info("\n接收微信请求：[msg_signature=[{}], encrypt_type=[{}], signature=[{}]," +
@@ -73,7 +66,7 @@ public class WxPortalController {
                 inMessage = WxMaMessage.fromXml(requestBody);
             }
 
-            this.route(inMessage,appid);
+            this.route(inMessage, appid);
             return "success";
         }
 
