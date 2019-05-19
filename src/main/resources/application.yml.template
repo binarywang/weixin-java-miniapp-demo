@@ -1,4 +1,3 @@
-debug: true
 logging:
   level:
     org.springframework.web: info
