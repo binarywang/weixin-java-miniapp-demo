@@ -89,7 +89,7 @@ public class WxPortalController {
 
     private void route(WxMaMessage message, String appid) {
         try {
-            WxMaConfiguration.getRouters().get(appid).route(message);
+            WxMaConfiguration.getRouter(appid).route(message);
         } catch (Exception e) {
             this.logger.error(e.getMessage(), e);
         }

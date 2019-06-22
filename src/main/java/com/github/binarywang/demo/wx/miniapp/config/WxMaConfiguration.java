@@ -8,6 +8,7 @@ import cn.binarywang.wx.miniapp.bean.WxMaTemplateMessage;
 import cn.binarywang.wx.miniapp.config.WxMaInMemoryConfig;
 import cn.binarywang.wx.miniapp.message.WxMaMessageHandler;
 import cn.binarywang.wx.miniapp.message.WxMaMessageRouter;
+import com.github.binarywang.demo.wx.miniapp.controller.WxPortalController;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import me.chanjar.weixin.common.bean.result.WxMediaUploadResult;
@@ -38,10 +39,6 @@ public class WxMaConfiguration {
         this.properties = properties;
     }
 
-    public static Map<String, WxMaMessageRouter> getRouters() {
-        return routers;
-    }
-
     public static WxMaService getMaService(String appid) {
         WxMaService wxService = maServices.get(appid);
         if (wxService == null) {
@@ -49,6 +46,10 @@ public class WxMaConfiguration {
         }
 
         return wxService;
+    }
+
+    public static WxMaMessageRouter getRouter(String appid) {
+        return routers.get(appid);
     }
 
     @PostConstruct
