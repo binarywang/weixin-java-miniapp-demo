@@ -3,8 +3,7 @@ package com.github.binarywang.demo.wx.miniapp.config;
 import cn.binarywang.wx.miniapp.api.WxMaService;
 import cn.binarywang.wx.miniapp.api.impl.WxMaServiceImpl;
 import cn.binarywang.wx.miniapp.bean.WxMaKefuMessage;
-import cn.binarywang.wx.miniapp.bean.WxMaTemplateData;
-import cn.binarywang.wx.miniapp.bean.WxMaTemplateMessage;
+import cn.binarywang.wx.miniapp.bean.WxMaSubscribeMessage;
 import cn.binarywang.wx.miniapp.config.impl.WxMaDefaultConfigImpl;
 import cn.binarywang.wx.miniapp.message.WxMaMessageHandler;
 import cn.binarywang.wx.miniapp.message.WxMaMessageRouter;
@@ -78,19 +77,18 @@ public class WxMaConfiguration {
         final WxMaMessageRouter router = new WxMaMessageRouter(service);
         router
             .rule().handler(logHandler).next()
-            .rule().async(false).content("模板").handler(templateMsgHandler).end()
+            .rule().async(false).content("订阅消息").handler(subscribeMsgHandler).end()
             .rule().async(false).content("文本").handler(textHandler).end()
             .rule().async(false).content("图片").handler(picHandler).end()
             .rule().async(false).content("二维码").handler(qrcodeHandler).end();
         return router;
     }
 
-    private final WxMaMessageHandler templateMsgHandler = (wxMessage, context, service, sessionManager) -> {
-        service.getMsgService().sendTemplateMsg(WxMaTemplateMessage.builder()
+    private final WxMaMessageHandler subscribeMsgHandler = (wxMessage, context, service, sessionManager) -> {
+        service.getMsgService().sendSubscribeMsg(WxMaSubscribeMessage.builder()
             .templateId("此处更换为自己的模板id")
-            .formId("自己替换可用的formid")
             .data(Lists.newArrayList(
-                new WxMaTemplateData("keyword1", "339208499", "#173177")))
+                new WxMaSubscribeMessage.Data("keyword1", "339208499")))
             .toUser(wxMessage.getFromUser())
             .build());
         return null;
