@@ -5,15 +5,19 @@ import cn.binarywang.wx.miniapp.api.impl.WxMaServiceImpl;
 import cn.binarywang.wx.miniapp.bean.WxMaKefuMessage;
 import cn.binarywang.wx.miniapp.bean.WxMaSubscribeMessage;
 import cn.binarywang.wx.miniapp.config.impl.WxMaDefaultConfigImpl;
+import cn.binarywang.wx.miniapp.config.impl.WxMaRedisConfigImpl;
 import cn.binarywang.wx.miniapp.message.WxMaMessageHandler;
 import cn.binarywang.wx.miniapp.message.WxMaMessageRouter;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import lombok.extern.slf4j.Slf4j;
 import me.chanjar.weixin.common.bean.result.WxMediaUploadResult;
 import me.chanjar.weixin.common.error.WxErrorException;
+import me.chanjar.weixin.common.error.WxRuntimeException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
+import redis.clients.jedis.JedisPool;
 
 import javax.annotation.PostConstruct;
 import java.io.File;
@@ -24,13 +28,14 @@ import java.util.stream.Collectors;
 /**
  * @author <a href="https://github.com/binarywang">Binary Wang</a>
  */
+@Slf4j
 @Configuration
 @EnableConfigurationProperties(WxMaProperties.class)
 public class WxMaConfiguration {
-    private WxMaProperties properties;
+    private final WxMaProperties properties;
 
-    private static Map<String, WxMaMessageRouter> routers = Maps.newHashMap();
-    private static Map<String, WxMaService> maServices = Maps.newHashMap();
+    private static final Map<String, WxMaMessageRouter> routers = Maps.newHashMap();
+    private static Map<String, WxMaService> maServices;
 
     @Autowired
     public WxMaConfiguration(WxMaProperties properties) {
@@ -54,12 +59,13 @@ public class WxMaConfiguration {
     public void init() {
         List<WxMaProperties.Config> configs = this.properties.getConfigs();
         if (configs == null) {
-            throw new RuntimeException("大哥，拜托先看下项目首页的说明（readme文件），添加下相关配置，注意别配错了！");
+            throw new WxRuntimeException("大哥，拜托先看下项目首页的说明（readme文件），添加下相关配置，注意别配错了！");
         }
 
         maServices = configs.stream()
             .map(a -> {
-                WxMaDefaultConfigImpl config = new WxMaDefaultConfigImpl();
+//                WxMaDefaultConfigImpl config = new WxMaDefaultConfigImpl();
+                WxMaDefaultConfigImpl config = new WxMaRedisConfigImpl(new JedisPool());
                 config.setAppid(a.getAppid());
                 config.setSecret(a.getSecret());
                 config.setToken(a.getToken());
@@ -95,7 +101,7 @@ public class WxMaConfiguration {
     };
 
     private final WxMaMessageHandler logHandler = (wxMessage, context, service, sessionManager) -> {
-        System.out.println("收到消息：" + wxMessage.toString());
+        log.info("收到消息：" + wxMessage.toString());
         service.getMsgService().sendKefuMsg(WxMaKefuMessage.newTextBuilder().content("收到信息为：" + wxMessage.toJson())
             .toUser(wxMessage.getFromUser()).build());
         return null;
