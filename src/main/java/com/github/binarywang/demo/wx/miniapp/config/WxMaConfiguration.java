@@ -64,8 +64,9 @@ public class WxMaConfiguration {
 
         maServices = configs.stream()
             .map(a -> {
-//                WxMaDefaultConfigImpl config = new WxMaDefaultConfigImpl();
-                WxMaDefaultConfigImpl config = new WxMaRedisConfigImpl(new JedisPool());
+                WxMaDefaultConfigImpl config = new WxMaDefaultConfigImpl();
+//                WxMaDefaultConfigImpl config = new WxMaRedisConfigImpl(new JedisPool());
+                // 使用上面的配置时，需要同时引入jedis-lock的依赖，否则会报类无法找到的异常
                 config.setAppid(a.getAppid());
                 config.setSecret(a.getSecret());
                 config.setToken(a.getToken());
