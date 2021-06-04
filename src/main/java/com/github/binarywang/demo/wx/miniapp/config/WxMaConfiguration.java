@@ -95,7 +95,7 @@ public class WxMaConfiguration {
         service.getMsgService().sendSubscribeMsg(WxMaSubscribeMessage.builder()
             .templateId("此处更换为自己的模板id")
             .data(Lists.newArrayList(
-                new WxMaSubscribeMessage.Data("keyword1", "339208499")))
+                new WxMaSubscribeMessage.MsgData("keyword1", "339208499")))
             .toUser(wxMessage.getFromUser())
             .build());
         return null;
