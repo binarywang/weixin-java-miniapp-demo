@@ -1,20 +1,19 @@
 package com.github.binarywang.demo.wx.miniapp.controller;
 
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
 import cn.binarywang.wx.miniapp.api.WxMaService;
 import cn.binarywang.wx.miniapp.bean.WxMaJscode2SessionResult;
 import cn.binarywang.wx.miniapp.bean.WxMaPhoneNumberInfo;
 import cn.binarywang.wx.miniapp.bean.WxMaUserInfo;
-import com.github.binarywang.demo.wx.miniapp.config.WxMaConfiguration;
+import cn.binarywang.wx.miniapp.util.WxMaConfigHolder;
 import com.github.binarywang.demo.wx.miniapp.utils.JsonUtils;
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import me.chanjar.weixin.common.error.WxErrorException;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * 微信小程序用户接口
@@ -22,9 +21,11 @@ import me.chanjar.weixin.common.error.WxErrorException;
  * @author <a href="https://github.com/binarywang">Binary Wang</a>
  */
 @RestController
+@AllArgsConstructor
+@Slf4j
 @RequestMapping("/wx/user/{appid}")
 public class WxMaUserController {
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+    private final WxMaService wxMaService;
 
     /**
      * 登陆接口
@@ -35,17 +36,21 @@ public class WxMaUserController {
             return "empty jscode";
         }
 
-        final WxMaService wxService = WxMaConfiguration.getMaService(appid);
+        if (!wxMaService.switchover(appid)) {
+            throw new IllegalArgumentException(String.format("未找到对应appid=[%s]的配置，请核实！", appid));
+        }
 
         try {
-            WxMaJscode2SessionResult session = wxService.getUserService().getSessionInfo(code);
-            this.logger.info(session.getSessionKey());
-            this.logger.info(session.getOpenid());
+            WxMaJscode2SessionResult session = wxMaService.getUserService().getSessionInfo(code);
+            log.info(session.getSessionKey());
+            log.info(session.getOpenid());
             //TODO 可以增加自己的逻辑，关联业务相关数据
             return JsonUtils.toJson(session);
         } catch (WxErrorException e) {
-            this.logger.error(e.getMessage(), e);
+            log.error(e.getMessage(), e);
             return e.toString();
+        } finally {
+            WxMaConfigHolder.remove();//清理ThreadLocal
         }
     }
 
@@ -57,16 +62,19 @@ public class WxMaUserController {
     @GetMapping("/info")
     public String info(@PathVariable String appid, String sessionKey,
                        String signature, String rawData, String encryptedData, String iv) {
-        final WxMaService wxService = WxMaConfiguration.getMaService(appid);
+        if (!wxMaService.switchover(appid)) {
+            throw new IllegalArgumentException(String.format("未找到对应appid=[%s]的配置，请核实！", appid));
+        }
 
         // 用户信息校验
-        if (!wxService.getUserService().checkUserInfo(sessionKey, rawData, signature)) {
+        if (!wxMaService.getUserService().checkUserInfo(sessionKey, rawData, signature)) {
+            WxMaConfigHolder.remove();//清理ThreadLocal
             return "user check failed";
         }
 
         // 解密用户信息
-        WxMaUserInfo userInfo = wxService.getUserService().getUserInfo(sessionKey, encryptedData, iv);
-
+        WxMaUserInfo userInfo = wxMaService.getUserService().getUserInfo(sessionKey, encryptedData, iv);
+        WxMaConfigHolder.remove();//清理ThreadLocal
         return JsonUtils.toJson(userInfo);
     }
 
@@ -78,16 +86,19 @@ public class WxMaUserController {
     @GetMapping("/phone")
     public String phone(@PathVariable String appid, String sessionKey, String signature,
                         String rawData, String encryptedData, String iv) {
-        final WxMaService wxService = WxMaConfiguration.getMaService(appid);
+        if (!wxMaService.switchover(appid)) {
+            throw new IllegalArgumentException(String.format("未找到对应appid=[%s]的配置，请核实！", appid));
+        }
 
         // 用户信息校验
-        if (!wxService.getUserService().checkUserInfo(sessionKey, rawData, signature)) {
+        if (!wxMaService.getUserService().checkUserInfo(sessionKey, rawData, signature)) {
+            WxMaConfigHolder.remove();//清理ThreadLocal
             return "user check failed";
         }
 
         // 解密
-        WxMaPhoneNumberInfo phoneNoInfo = wxService.getUserService().getPhoneNoInfo(sessionKey, encryptedData, iv);
-
+        WxMaPhoneNumberInfo phoneNoInfo = wxMaService.getUserService().getPhoneNoInfo(sessionKey, encryptedData, iv);
+        WxMaConfigHolder.remove();//清理ThreadLocal
         return JsonUtils.toJson(phoneNoInfo);
     }
 
