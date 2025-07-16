@@ -40,13 +40,13 @@
         <dependency>
             <groupId>com.github.binarywang</groupId>
             <artifactId>weixin-java-miniapp</artifactId>
-            <version>${weixin-java-miniapp.version}</version>
+            <version>4.7.5-20250529.111829</version>
         </dependency>
 
         <dependency>
             <groupId>commons-fileupload</groupId>
             <artifactId>commons-fileupload</artifactId>
-            <version>1.5</version>
+            <version>1.6.0</version>
         </dependency>
 
         <!-- Testing Dependencies -->
